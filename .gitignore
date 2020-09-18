@@ -1,13 +1,15 @@
 # Prerequisites
 *.d
-
+*.gcc
+*.txt
 resources
 # Object files
 *.o
 *.ko
 *.obj
 *.elf
-
+r*
+.nfs*
 # Linker output
 *.ilk
 *.map

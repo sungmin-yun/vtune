@@ -13,7 +13,7 @@
 
 // matrix multiply routines
 #include "multiply.h"
-
+#include<immintrin.h>
 #ifdef USE_MKL
 #include "mkl.h"
 #endif //USE_MKL
@@ -146,6 +146,41 @@ void multiply4(int msize, int tidx, int numt, TYPE a[][NUM], TYPE b[][NUM], TYPE
 			for(k=0;k<msize;k++) {
 				c[i][j] = c[i][j] + a[i][k] * t[j][k];}}}
 */
+}
+
+
+void multiply5(int msize, int tidx, int numt, TYPE a[][NUM], TYPE b[][NUM], TYPE c[][NUM], TYPE t[][NUM])
+{
+	int i,j,k,i0,j0,k0,ibeg,ibound,istep,mblock;
+
+	istep = msize / numt;
+	ibeg = tidx * istep;
+	ibound = ibeg + istep;
+	mblock = MATRIX_BLOCK_SIZE;
+	double temp;
+	double buffer[8];
+	__m512d _a;
+
+	for (i0 = ibeg; i0 < ibound; i0 +=mblock) {
+		for (k0 = 0; k0 < msize; k0 += mblock) {
+			for (j0 =0; j0 < msize; j0 += mblock) {
+				for (i = i0; i < i0 + mblock; i++) {
+					for (k = k0; k < k0 + mblock; k++) {
+						temp=a[i][k];
+						for(int idx=0;idx<8;idx++)
+							buffer[idx]=temp;
+						_a=_mm512_load_pd(buffer);
+						for(j=j0;j<j0+mblock;j+=8){
+							__m512d _b=_mm512_load_pd(&b[k][j]);
+							__m512d _c=_mm512_load_pd(&c[i][j]);
+							_c=_mm512_fmadd_pd(_a,_b,_c);
+							_mm512_store_pd(&c[i][j],_c);
+						}
+					}
+				}
+			}
+		}
+	}
 }
 #endif // USE_THR
 

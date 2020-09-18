@@ -47,7 +47,7 @@ OPTFLAGS = -xSSE3
 # add -DALIGNED to the multiply.c and matrix.c
 LDFLAGS = -lpthread -lm
 
-GCFLAGS = $(CFLAGS) $(PARAMODEL)
+GCFLAGS = $(CFLAGS) $(PARAMODEL)-march=skylake-avx512
 ICFLAGS = $(CFLAGS) $(PARAMODEL)-DICC -debug inline-debug-info #-vec-report3 -qopt-report -qopt-report-phase=vec
 MKFLAGS = $(CFLAGS) -DUSE_MKL   -DICC -mkl -debug inline-debug-info
 
